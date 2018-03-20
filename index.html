@@ -18,10 +18,12 @@
     var timer;
     var stars;
     var flowers;
+    var flowerAmt = 0;
     var pauseBtn;
 
     function preload() {
-        game.load.image('sky', 'assets/sky.png');
+//        game.load.image('sky', 'assets/sky.png');
+        game.load.image('sky', 'img/ithaca.jpg');
         game.load.image('ground', 'assets/platform.png');
         game.load.image('star', 'assets/star.png');
         game.load.image('firstaid', 'assets/firstaid.png');
@@ -39,7 +41,7 @@
         game.add.sprite(0, 0, 'sky');
 
         //pause button
-        pauseBtn = game.add.sprite(game.world.width - game.world.width/8  , 16,  'pauseBtn');
+        pauseBtn = game.add.sprite(game.world.width - game.world.width / 8, 16, 'pauseBtn');
         pauseBtn.inputEnabled = true;
         //event listening for pause button
         pauseBtn.events.onInputDown.add(pauseOrUnPause, game);
@@ -59,19 +61,18 @@
 
         //instructions?
 
-        var instructions = this.add.text(0,game.world.height/2-100 ,"Clean Up The City! \nThere has been a horrible storm in Ithaca. \n" +
+        var instructions = this.add.text(0, game.world.height / 2 - 100, "Clean Up The City! \nThere has been a horrible storm in Ithaca. \n" +
                 "You have to help clean the city. \n" +
                 "To win this game you have to collect as many pieces of trash you can.\n" +
                 "If you step on the growing flowers you'll end the game. \n" +
-                "Save our town!" , this.style);
+                "Save our town!", this.style);
         // set event listener for user to tap screen
-        this.input.onDown.add(function(){
+        this.input.onDown.add(function () {
             //remove the instructions
             instructions.destroy();
             game.paused = false;
 
         }, this);
-
 
 
         // Create the player
@@ -107,11 +108,11 @@
         stars.enableBody = true;
 
         flowers = game.add.group();
-        flowers.enableBody= true;
+        flowers.enableBody = true;
 
 
         //spawn a star every 2 seconds
-        game.time.events.loop(2000, function() {
+        game.time.events.loop(2000, function () {
 
             if (currentTime > 2) {
                 spawnTriangle();
@@ -119,12 +120,13 @@
         }, game);
 
 
-        //spawn a flower every 7 seconds, unless the end of the game is near
-        game.time.events.loop(9000, function() {
-            spawnFlower();
+        if (flowerAmt < 4) {
+            //spawn a flower every 7 seconds, unless the end of the game is near
+            game.time.events.loop(9000, function () {
+                spawnFlower();
 
-        }, game);
-
+            }, game);
+        };
     }
 
     function spawnTriangle() {
@@ -154,6 +156,8 @@
         //  Let gravity do its thing
         flower.body.gravity.y = 50;
 
+        flowerAmt++;
+
     }
 
 
@@ -168,7 +172,6 @@
         if(starHitsGround){
 
             //  score equals 0;
-            score =0;
             scoreText.text = 'Score: ' + score;
 
             game.add.text(game.world.centerX, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
@@ -259,7 +262,6 @@
         // Removes the star from the screen
         flower.kill();
         //  score equals 0;
-        score =0;
         scoreText.text = 'Score: ' + score;
 
         game.add.text(game.world.centerX, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
