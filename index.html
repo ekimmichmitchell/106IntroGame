@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Trash Pick Up!</title>
+    <script src="lib/phaser.min.js"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+
+    var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+    var score = 0;
+    var scoreText;
+    var currentTime = 0;
+    var timer;
+    var stars;
+    var flowers;
+    var pauseBtn;
+
+    function preload() {
+        game.load.image('sky', 'assets/sky.png');
+        game.load.image('ground', 'assets/platform.png');
+        game.load.image('star', 'assets/star.png');
+        game.load.image('firstaid', 'assets/firstaid.png');
+        game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+        game.load.image('pauseBtn', 'assets/diamond.png');
+
+    }
+
+    function create() {
+        //adds physics into game
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+
+        game.add.sprite(0, 0, 'sky');
+
+        //pause button
+        pauseBtn = game.add.sprite(game.world.width - game.world.width/8  , 16,  'pauseBtn' );
+        pauseBtn.inputEnabled = true;
+        //event listening for pause button
+        pauseBtn.events.onInputDown.add(pauseOrUnPause, game);
+
+
+        // Create the ground!
+        platforms = game.add.group();
+        //  We will enable physics for any object that is created in this group
+        platforms.enableBody = true;
+        // Creating the actual ground here.
+        var ground = platforms.create(0, game.world.height - 64, 'ground');
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        ground.scale.setTo(2, 2);
+        ground.body.immovable = true;
+
+
+        game.paused = true;
+
+        //instructions?
+
+        var instructions = this.add.text(0,game.world.height/2-100 ,"Clean Up The City! \nThere has been a horrible storm in Ithaca. \n" +
+                "You have to help clean the city. \n" +
+                "To win this game you have to collect as many pieces of trash you can.\n" +
+                "If you step on the growing flowers you'll end the game. \n" +
+                "Save our town!" , this.style);
+        // set event listener for user to tap screen
+        this.input.onDown.add(function(){
+            //remove the instructions
+            instructions.destroy();
+            game.paused = false;
+
+        }, this);
+
+
+
+
+
+
+        // Create the player
+        player = game.add.sprite(32, game.world.height - 150, 'dude');
+
+        //Give the player phsyics
+        game.physics.arcade.enable(player);
+
+        //  Player physics properties. Give the little guy a slight bounce.
+        player.body.bounce.y = 0.4;
+        player.body.gravity.y = 400;
+        player.body.collideWorldBounds = true;
+
+        //  Our two animations, walking left and right.
+        //sprite sheet thus you can chose which images to use for each
+        player.animations.add('left', [0, 1, 2, 3], 10, true);
+        player.animations.add('right', [5, 6, 7, 8], 10, true);
+
+
+        scoreText = game.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#000'});
+
+        //Timer for how long the game goes (seconds)
+        timer = game.add.text(200, 16, "Timer: " + currentTime, {fontSize: "32px"});
+
+        game.time.events.loop(1000, updateTimer, this);
+
+
+        //initialize stars group
+        stars = game.add.group();
+        //allow physics for stars
+        stars.enableBody = true;
+
+        flowers = game.add.group();
+        flowers.enableBody= true;
+
+
+        //spawn a star every 2 seconds
+        game.time.events.loop(2000, function() {
+
+            if (currentTime > 2) {
+                spawnTriangle();
+            }
+        }, game);
+
+
+        //spawn a flower every 7 seconds, unless the end of the game is near
+        game.time.events.loop(9000, function() {
+            spawnFlower();
+
+        }, game);
+
+
+
+    }
+
+    function spawnTriangle() {
+
+        var dropPos = Math.floor(Math.random()*game.width);
+
+        var star = stars.create(dropPos, 0, 'star');
+
+        //give the star physics?
+        game.physics.arcade.enable(star);
+
+        //  Let gravity do its thing
+        star.body.gravity.y = 50;
+
+    }
+
+
+    function spawnFlower() {
+
+        var dropPos = Math.floor(Math.random()*game.width);
+
+        var flower = flowers.create(dropPos, 0, 'firstaid');
+
+        //give the flower physics
+        game.physics.arcade.enable(flower);
+
+        //  Let gravity do its thing
+        flower.body.gravity.y = 50;
+
+    }
+
+
+
+    function update() {
+
+        //if the player is touching the platform (ground)
+        var hitPlatform = game.physics.arcade.collide(player, platforms);
+
+        var starHitsGround = game.physics.arcade.collide(stars, platforms);
+
+        if(starHitsGround){
+
+            //  score equals 0;
+            score =0;
+            scoreText.text = 'Score: ' + score;
+
+            game.add.text(game.world.centerX, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
+
+            game.gamePaused();
+
+        }
+
+
+        //so the flowers drop onto the ground
+        game.physics.arcade.collide(flowers, platforms);
+
+
+        //if the stars and the guy overlap!
+        game.physics.arcade.overlap(player, stars, collectStar, null, this);
+        //if the flowers and the guy overlap
+        game.physics.arcade.overlap(player, flowers, hitFlower, null, this);
+
+
+        //allow the player to move around with the keyboard
+
+        cursors = game.input.keyboard.createCursorKeys();
+        //  Reset the players movement
+        player.body.velocity.x = 0;
+
+        if (cursors.left.isDown) {
+            //  Move to the left
+            player.body.velocity.x = -400;
+
+            player.animations.play('left');
+        } else if (cursors.right.isDown) {
+            //  Move to the right
+            player.body.velocity.x = 400;
+
+            player.animations.play('right');
+        } else if(cursors.down.isDown && !player.body.touching.down){
+
+            //move player down
+            player.body.velocity.y = 400;
+
+        }else {
+            player.animations.stop();
+            //this is when the player is facing you
+            player.frame = 4;
+        }
+
+        //  Player can jump if they are touching the ground.
+        if (cursors.up.isDown && player.body.touching.down && hitPlatform) {
+            player.body.velocity.y = -350;
+        }
+
+    }
+
+    function pauseOrUnPause() {
+
+        game.paused = true;
+        var pausedText = game.add.text(game.world.centerX, game.world.centerY, 'Paused!', {fontSize: '50px', fill: '#000'});
+
+        // set event listener for user to tap screen
+        this.input.onDown.add(function(){
+            //remove the instructions
+            pausedText.destroy();
+            game.paused = false;
+
+        }, this);
+
+
+    }
+
+
+
+    function updateTimer() {
+        //increase current timer and set remaining time text
+        currentTime++;
+        timer.setText("Time: " + currentTime);
+    }
+
+
+    function collectStar (player, star) {
+        // Removes the star from the screen
+        star.kill();
+        //  Add and update the score
+        score += 1;
+        scoreText.text = 'Score: ' + score;
+    }
+
+
+
+    function hitFlower (player, flower) {
+        // Removes the star from the screen
+        flower.kill();
+        //  score equals 0;
+        score =0;
+        scoreText.text = 'Score: ' + score;
+
+        game.add.text(game.world.centerX, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
+
+        game.gamePaused();
+
+
+    }
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
