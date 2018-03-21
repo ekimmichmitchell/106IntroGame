@@ -22,12 +22,17 @@
     var pauseBtn;
 
     function preload() {
-        game.load.image('background', 'assets/sky.png');
-        game.load.image('ground', 'assets/platform.png');
-        game.load.image('trash', 'assets/star.png');
-        game.load.image('flower', 'assets/firstaid.png');
+//        game.load.image('background', 'assets/sky.png');
+        game.load.image('background', 'img/background.jpg');
+//        game.load.image('ground', 'assets/platform.png');
+        game.load.image('ground', 'img/ground.png');
+        game.load.image('trash', 'img/trashBag.png');
+//        game.load.image('trash', 'assets/star.png');
+//        game.load.image('flower', 'assets/firstaid.png');
+        game.load.image('flower', 'img/flower.png');
         game.load.spritesheet('player', 'assets/dude.png', 32, 48);
-        game.load.image('pauseBtn', 'assets/diamond.png');
+//        game.load.image('pauseBtn', 'assets/diamond.png');
+        game.load.image('pauseBtn', 'img/pause.png');
 
     }
 
@@ -125,6 +130,7 @@
 
         var dropPos = Math.floor(Math.random()*game.width);
         var trash = trashCollection.create(dropPos, 0, 'trash');
+        trash.scale.set(0.5,0.5);
         //give the trash physics?
         game.physics.arcade.enable(trash);
         //  Let gravity do its thing
@@ -137,6 +143,7 @@
         var dropPos = Math.floor(Math.random()*game.width);
 
         var flower = flowers.create(dropPos, 0, 'flower');
+        flower.scale.set(0.9,0.9);
 
         //give the flower physics
         game.physics.arcade.enable(flower);
