@@ -22,16 +22,13 @@
     var pauseBtn;
 
     function preload() {
-//        game.load.image('background', 'assets/sky.png');
         game.load.image('background', 'img/background.jpg');
-//        game.load.image('ground', 'assets/platform.png');
         game.load.image('ground', 'img/ground.png');
         game.load.image('trash', 'img/trashBag.png');
-//        game.load.image('trash', 'assets/star.png');
-//        game.load.image('flower', 'assets/firstaid.png');
         game.load.image('flower', 'img/flower.png');
-        game.load.spritesheet('player', 'assets/dude.png', 32, 48);
-//        game.load.image('pauseBtn', 'assets/diamond.png');
+//        game.load.spritesheet('player', 'assets/dude.png', 32, 48);
+//        game.load.image('player','img/pause.png', 32, 48);
+        game.load.image('player', 'img/trashCan.png', 32, 48);
         game.load.image('pauseBtn', 'img/pause.png');
 
     }
@@ -79,7 +76,7 @@
 
         // Create the player
         player = game.add.sprite(32, game.world.height - 150, 'player');
-//        player.scale.setTo(0.7, 0.7);
+//        player.scale.setTo(0.5, 0.5);
 
 
         //Give the player phsyics
