@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Trash Pick Up!</title>
+    <title>Clean Up The City!</title>
     <script src="lib/phaser.min.js"></script>
 
 </head>
@@ -23,13 +23,14 @@
 
     function preload() {
         game.load.image('background', 'img/background.jpg');
-        game.load.image('ground', 'img/ground.png');
+        game.load.image('instructionPage', 'img/instruction.jpg');
+        game.load.image('ground', 'img/fl.jpg');
         game.load.image('trash', 'img/trashBag.png');
         game.load.image('flower', 'img/flower.png');
-//        game.load.spritesheet('player', 'assets/dude.png', 32, 48);
 //        game.load.image('player','img/pause.png', 32, 48);
         game.load.image('player', 'img/trashCan.png', 32, 48);
-        game.load.image('pauseBtn', 'img/pause.png');
+//        game.load.image('pauseBtn', 'img/pause.png');
+        game.load.image('pauseBtn', 'img/pauseBtn.png');
 
     }
 
@@ -41,6 +42,7 @@
 
         //pause button
         pauseBtn = game.add.sprite(game.world.width - game.world.width / 8, 16, 'pauseBtn');
+        pauseBtn.scale.set(0.5,0.5);
         pauseBtn.inputEnabled = true;
         //event listening for pause button
         pauseBtn.events.onInputDown.add(pauseOrUnPause, game);
@@ -58,25 +60,57 @@
 
         game.paused = true;
 
+        var insPage = game.add.sprite(0,0, 'instructionPage');
         //instructions?
 
-        var instructions = this.add.text(0, game.world.height / 2 - 100, "Clean Up The City! \nThere has been a horrible storm in Ithaca. \n" +
-                "You have to help clean the city. \n" +
-                "To win this game you have to collect as many pieces of trash you can.\n" +
-                "If you step on the growing flowers you'll end the game. \n" +
-                "Save our town!", this.style);
+        var titleStyle = { font: "60px Arial",
+            fill: "#ffffff",
+            align: "center"};
+
+
+        var style = { font: "30px Arial",
+            fill: "#ffffff",
+            align: "center"};
+
+
+        var instructions = this.add.text(game.world.centerX, game.world.height/2-160, "Clean Up The City!",  titleStyle);
+        var ins2 = this.add.text(game.world.centerX, game.world.height/2 -80 , "There has been a horrible storm and trash is everywhere!", style);
+        var ins3 = this.add.text(game.world.centerX, game.world.height/2 -40 , "To win this game you have to collect as many pieces of ", style);
+        var ins4 = this.add.text(game.world.centerX, game.world.height/2 , "trash as you can without stepping on the growing flowers.", style);
+        var ins5 = this.add.text(game.world.centerX, game.world.height/2 +40, "Use the arrow keys to collect the trash", style);
+        var ins6 = this.add.text(game.world.centerX, game.world.height/2+80 , "and use the up and down keys to jump over the flowers", style);
+        var ins7 = this.add.text(game.world.centerX, game.world.height/2 + 120, "Clean our town!", style);
+
+
+        instructions.anchor.setTo(0.5, 0.5);
+        ins2.anchor.setTo(0.5, 0.5);
+        ins3.anchor.setTo(0.5, 0.5);
+        ins4.anchor.setTo(0.5, 0.5);
+        ins5.anchor.setTo(0.5, 0.5);
+        ins6.anchor.setTo(0.5, 0.5);
+        ins7.anchor.setTo(0.5, 0.5);
+
+
         // set event listener for user to tap screen
         this.input.onDown.add(function () {
             //remove the instructions
             instructions.destroy();
+            ins2.destroy();
+            ins3.destroy();
+            ins4.destroy();
+            ins5.destroy();
+            ins6.destroy();
+            ins7.destroy();
+
+            insPage.destroy();
+
             game.paused = false;
 
         }, this);
 
 
         // Create the player
-        player = game.add.sprite(32, game.world.height - 150, 'player');
-//        player.scale.setTo(0.5, 0.5);
+        player = game.add.sprite(32, game.world.height - 200, 'player');
 
 
         //Give the player phsyics
@@ -88,10 +122,13 @@
         player.body.collideWorldBounds = true;
 
 
-        scoreText = game.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#000'});
+        var variableFont = { font: "32px Arial",
+            fill: "#ffffff",
+            align: "center"};
+        scoreText = game.add.text(16, 16, 'Score: 0', variableFont);
 
         //Timer for how long the game goes (seconds)
-        timer = game.add.text(200, 16, "Timer: " + currentTime, {fontSize: "32px"});
+        timer = game.add.text(200, 16, "Timer: " + currentTime, variableFont);
 
         game.time.events.loop(1000, updateTimer, this);
 
@@ -122,6 +159,8 @@
             }, game);
         };
     }
+
+
 
     function spawnTrash() {
 
@@ -166,9 +205,10 @@
             //  score equals 0;
             scoreText.text = 'Score: ' + score;
 
-            game.add.text(game.world.centerX-100, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
+            game.add.text(game.world.centerX-100, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#ffffff'});
 
-            game.gamePaused();
+            game.paused = true;
+
 
         }
 
@@ -218,7 +258,7 @@
     function pauseOrUnPause() {
 
         game.paused = true;
-        var pausedText = game.add.text(game.world.centerX-100, game.world.centerY, 'Paused!', {fontSize: '50px', fill: '#000'});
+        var pausedText = game.add.text(game.world.centerX-100, game.world.centerY, 'Paused!', {fontSize: '50px', fill: '#ffffff'});
 
         // set event listener for user to tap screen
         this.input.onDown.add(function(){
@@ -254,9 +294,9 @@
         //  score equals 0;
         scoreText.text = 'Score: ' + score;
 
-        game.add.text(game.world.centerX, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
+        game.add.text(game.world.centerX-100, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#ffffff'});
+        game.paused = true;
 
-        game.gamePaused();
     }
 
 
