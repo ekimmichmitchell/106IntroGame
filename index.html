@@ -22,14 +22,11 @@
     var pauseBtn;
 
     function preload() {
-//        game.load.image('sky', 'assets/sky.png');
-        game.load.image('sky', 'img/ithaca.jpg');
+        game.load.image('background', 'assets/sky.png');
         game.load.image('ground', 'assets/platform.png');
-        game.load.image('star', 'assets/star.png');
-        game.load.image('firstaid', 'assets/firstaid.png');
-//        game.load.image('dude', 'img/TRASH.png', 32, 48);
-        game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-
+        game.load.image('trash', 'assets/star.png');
+        game.load.image('flower', 'assets/firstaid.png');
+        game.load.spritesheet('player', 'assets/dude.png', 32, 48);
         game.load.image('pauseBtn', 'assets/diamond.png');
 
     }
@@ -38,7 +35,7 @@
         //adds physics into game
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        game.add.sprite(0, 0, 'sky');
+        game.add.sprite(0, 0, 'background');
 
         //pause button
         pauseBtn = game.add.sprite(game.world.width - game.world.width / 8, 16, 'pauseBtn');
@@ -76,7 +73,7 @@
 
 
         // Create the player
-        player = game.add.sprite(32, game.world.height - 150, 'dude');
+        player = game.add.sprite(32, game.world.height - 150, 'player');
 //        player.scale.setTo(0.7, 0.7);
 
 
@@ -133,7 +130,7 @@
 
         var dropPos = Math.floor(Math.random()*game.width);
 
-        var star = stars.create(dropPos, 0, 'star');
+        var star = stars.create(dropPos, 0, 'trash');
 
         //give the star physics?
         game.physics.arcade.enable(star);
@@ -148,7 +145,7 @@
 
         var dropPos = Math.floor(Math.random()*game.width);
 
-        var flower = flowers.create(dropPos, 0, 'firstaid');
+        var flower = flowers.create(dropPos, 0, 'flower');
 
         //give the flower physics
         game.physics.arcade.enable(flower);
@@ -174,7 +171,7 @@
             //  score equals 0;
             scoreText.text = 'Score: ' + score;
 
-            game.add.text(game.world.centerX, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
+            game.add.text(game.world.centerX-100, game.world.centerY, 'You Lose!', {fontSize: '50px', fill: '#000'});
 
             game.gamePaused();
 
@@ -228,7 +225,7 @@
     function pauseOrUnPause() {
 
         game.paused = true;
-        var pausedText = game.add.text(game.world.centerX, game.world.centerY, 'Paused!', {fontSize: '50px', fill: '#000'});
+        var pausedText = game.add.text(game.world.centerX-100, game.world.centerY, 'Paused!', {fontSize: '50px', fill: '#000'});
 
         // set event listener for user to tap screen
         this.input.onDown.add(function(){
