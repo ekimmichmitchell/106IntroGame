@@ -16,7 +16,7 @@
     var scoreText;
     var currentTime = 0;
     var timer;
-    var stars;
+    var trashCollection;
     var flowers;
     var flowerAmt = 0;
     var pauseBtn;
@@ -85,11 +85,6 @@
         player.body.gravity.y = 400;
         player.body.collideWorldBounds = true;
 
-        //  Our two animations, walking left and right.
-        //sprite sheet thus you can chose which images to use for each
-//        player.animations.add('left', [0, 1, 2, 3], 10, true);
-//        player.animations.add('right', [5, 6, 7, 8], 10, true);
-
 
         scoreText = game.add.text(16, 16, 'Score: 0', {fontSize: '32px', fill: '#000'});
 
@@ -99,20 +94,20 @@
         game.time.events.loop(1000, updateTimer, this);
 
 
-        //initialize stars group
-        stars = game.add.group();
-        //allow physics for stars
-        stars.enableBody = true;
+        //initialize trash group
+        trashCollection = game.add.group();
+        //allow physics for trash
+        trashCollection.enableBody = true;
 
         flowers = game.add.group();
         flowers.enableBody = true;
 
 
-        //spawn a star every 2 seconds
+        //spawn a trash every 2 seconds
         game.time.events.loop(2000, function () {
 
             if (currentTime > 2) {
-                spawnTriangle();
+                spawnTrash();
             }
         }, game);
 
@@ -126,18 +121,14 @@
         };
     }
 
-    function spawnTriangle() {
+    function spawnTrash() {
 
         var dropPos = Math.floor(Math.random()*game.width);
-
-        var star = stars.create(dropPos, 0, 'trash');
-
-        //give the star physics?
-        game.physics.arcade.enable(star);
-
+        var trash = trashCollection.create(dropPos, 0, 'trash');
+        //give the trash physics?
+        game.physics.arcade.enable(trash);
         //  Let gravity do its thing
-        star.body.gravity.y = 50;
-
+        trash.body.gravity.y = 50;
     }
 
 
@@ -162,11 +153,11 @@
     function update() {
 
         //if the player is touching the platform (ground)
-        var hitPlatform = game.physics.arcade.collide(player, platforms);
+        var playerTouchesGround = game.physics.arcade.collide(player, platforms);
 
-        var starHitsGround = game.physics.arcade.collide(stars, platforms);
+        var trashTouchesGround = game.physics.arcade.collide(trashCollection, platforms);
 
-        if(starHitsGround){
+        if(trashTouchesGround){
 
             //  score equals 0;
             scoreText.text = 'Score: ' + score;
@@ -182,14 +173,13 @@
         game.physics.arcade.collide(flowers, platforms);
 
 
-        //if the stars and the guy overlap!
-        game.physics.arcade.overlap(player, stars, collectStar, null, this);
+        //if the trash and the guy overlap!
+        game.physics.arcade.overlap(player, trashCollection, collectTrash, null, this);
         //if the flowers and the guy overlap
         game.physics.arcade.overlap(player, flowers, hitFlower, null, this);
 
 
         //allow the player to move around with the keyboard
-
         cursors = game.input.keyboard.createCursorKeys();
         //  Reset the players movement
         player.body.velocity.x = 0;
@@ -211,12 +201,11 @@
 
         }else {
             player.animations.stop();
-            //this is when the player is facing you
-//            player.frame = 4;
+
         }
 
         //  Player can jump if they are touching the ground.
-        if (cursors.up.isDown && player.body.touching.down && hitPlatform) {
+        if (cursors.up.isDown && player.body.touching.down && playerTouchesGround) {
             player.body.velocity.y = -350;
         }
 
@@ -245,9 +234,9 @@
     }
 
 
-    function collectStar (player, star) {
-        // Removes the star from the screen
-        star.kill();
+    function collectTrash (player, trash) {
+        // Removes the trash from the screen
+        trash.kill();
         //  Add and update the score
         score += 1;
         scoreText.text = 'Score: ' + score;
@@ -256,7 +245,7 @@
 
 
     function hitFlower (player, flower) {
-        // Removes the star from the screen
+        // Removes the flower from the screen
         flower.kill();
         //  score equals 0;
         scoreText.text = 'Score: ' + score;
